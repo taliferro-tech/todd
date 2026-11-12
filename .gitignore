@@ -37,3 +37,11 @@ src/assets/find/entities/*/logo.png
 src/assets/find/entities/*/logo-bw.png
 src/assets/find/entities/*/logo-ios-icon.png
 src/assets/find/entities/todd/logo-icon.png
+
+# Video files — never commit these; host them externally (YouTube, Storage, etc.).
+*.mp4
+*.mov
+*.webm
+*.m4v
+*.avi
+*.mkv
