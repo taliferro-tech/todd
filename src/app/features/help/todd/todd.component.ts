@@ -37,7 +37,7 @@ import { AskAward, AskAwardsService } from '../../../services/ask-awards.service
 import { AskAwardsComponent } from '../../../shared/ask-awards/ask-awards.component';
 import { SiteFooterComponent } from '../../../shared/site-footer/site-footer.component';
 import { AlsoFromUsComponent } from '../../../shared/also-from-us/also-from-us.component';
-
+import { AssistantMissionComponent, AssistantMissionsService } from '../../../shared/missions/assistant-missions';
 
 type ToddShowcaseModule = string;
 
@@ -102,6 +102,14 @@ interface ToddProductHandoff {
 }
 
 /** A question with a few likely answers, shown as option pills under an answer. */
+/** A tool's answer as HTML: escaped text, its paragraphs, and [label](https://...) links made real. */
+export function toolAnswerHtml ( text: string ): string {
+  const escape = ( value: string ) => value.replace( /&/g, '&amp;' ).replace( /</g, '&lt;' ).replace( />/g, '&gt;' ).replace( /"/g, '&quot;' );
+  return String( text || '' ).trim().split( /\n{2,}/ ).filter( Boolean ).map( ( part ) => `<p>${ escape( part )
+    .replace( /\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g, ( _m, label: string, href: string ) => `<a href="${ href }" target="_blank" rel="noopener">${ label }</a>` )
+    .replace( /\n/g, '<br>' ) }</p>` ).join( '' );
+}
+
 interface ChatChoice {
   question: string;
   options: string[];
@@ -112,6 +120,8 @@ interface ChatChoice {
 interface ChatTurn {
   role: 'user' | 'assistant';
   content: string;
+  /** A Mission the Missions gate started from this ask, shown in place. */
+  missionId?: string;
   choices?: ChatChoice[];
   /** The pills can still be tapped: the latest answer, until it's answered. */
   choicesOpen?: boolean;
@@ -122,12 +132,13 @@ interface ChatTurn {
 @Component( {
   selector: 'app-todd',
   standalone: true,
-  imports: [ AlsoFromUsComponent, AutoGrowDirective, SiteFooterComponent, CommonModule, FormsModule, RouterModule, AskAwardsComponent],
+  imports: [ AlsoFromUsComponent, AutoGrowDirective, SiteFooterComponent, CommonModule, FormsModule, RouterModule, AskAwardsComponent, AssistantMissionComponent],
   templateUrl: './todd.component.html',
   styleUrl: './todd.component.css'
 } )
 
 export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy, AfterViewInit {
+  private readonly assistantMissions = inject( AssistantMissionsService );
   @ViewChild( 'history' ) historyRef!: ElementRef<HTMLDivElement>;
   @ViewChild( 'assistantInput' ) assistantInputRef?: ElementRef<HTMLInputElement | HTMLTextAreaElement>;
 
@@ -527,6 +538,12 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
       return;
     }
 
+    if ( !fromChoices && await this.tryMission( prompt ) ) {
+      this.isLoading = false;
+      this.focusAssistantInput();
+      return;
+    }
+
     const questionAndAnswerHistory = this.buildProspectHistory();
 
     this.askSubscription = this.resolveProspectPageContext( prompt )
@@ -624,6 +641,30 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
           this.focusAssistantInput();
         }
       } );
+  }
+
+  /**
+   * The Missions gate, as every other app's assistant asks it (Ty,
+   * 2026-11-17: the General Assistant answered "phone numbers for the VCs in
+   * my Drip" with questions and a promise, because this chat never asked the
+   * gate, so its tools never ran). Real work becomes a Mission shown here; a
+   * quick question is answered by its tool. Signed-in only; help questions,
+   * guests and any error fall through to the assistant as before.
+   * @returns true when the ask was handled here.
+   */
+  private async tryMission ( prompt: string ): Promise<boolean> {
+    if ( !this.userId || this.userId === 'Taliferro' ) return false;
+    const route = await this.assistantMissions.route( prompt, 'general-assistant' );
+    if ( route?.kind === 'mission' ) {
+      this.onMessage( { role: 'assistant', content: '<p>I made this a Mission. Here is the plan:</p>', missionId: route.missionId } );
+      this.assistantMissions.reveal();
+      return true;
+    }
+    if ( route?.kind === 'answer' ) {
+      this.onMessage( { role: 'assistant', content: toolAnswerHtml( route.text ) } );
+      return true;
+    }
+    return false;
   }
 
   openAwards (): void {

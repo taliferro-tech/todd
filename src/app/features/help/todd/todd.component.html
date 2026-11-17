@@ -48,6 +48,7 @@
             <ng-container *ngIf="m.role === 'assistant'"><img class="ask-answer__avatar brand-mark--light" src="assets/brand/products/svg/light/02-general-assistant.svg" alt="" /><img class="ask-answer__avatar brand-mark--dark" src="assets/brand/products/svg/dark/02-general-assistant.svg" alt="" /></ng-container>
             <div class="ask-answer__body">
               <div class="bubble-inner" [innerHTML]="m.content"></div>
+              <tm-assistant-mission *ngIf="m.missionId" [missionId]="m.missionId" [viewerId]="userId || ''" />
               <div class="chat-choice" *ngFor="let choice of m.choices">
                 <p class="chat-choice__question">{{ choice.question }}</p>
                 <div class="chat-choice__options" role="group" [attr.aria-label]="choice.question">
