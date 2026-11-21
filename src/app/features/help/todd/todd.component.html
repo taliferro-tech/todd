@@ -5,6 +5,10 @@
         <span class="ask-home__logo"><img src="assets/ask-todd-logo.png" alt="" /></span>
         <p class="ask-home__brand">16Ahead</p>
         <h1 class="ask-home__title">General Assistant</h1>
+        <aside class="ask-browse" *ngIf="signedOut" role="note" data-cy="browse-notice">
+          <p><span class="ask-browse__eyebrow">Browse mode</span><strong>You're not signed in.</strong> You can still ask anything about 16Ahead. Sign in to save your answers, keep your awards, and hand 16Ahead work with Missions.</p>
+          <button type="button" class="ask-browse__btn" (click)="signInFromBrowseNote()">Sign in</button>
+        </aside>
         <div class="ask-search">
           <textarea #assistantInput appAutoGrow rows="1" [(ngModel)]="assistantPrompt" (ngModelChange)="onAssistantPromptChange()" placeholder="Ask anything about 16Ahead…" aria-label="General Assistant" (keydown.enter)="askAssistant()" (keydown.escape)="dismissRouteSuggestions()" [disabled]="askToddTourInputLocked"></textarea>
           <button type="button" class="ask-search__go" (click)="askAssistant()" [disabled]="askToddTourInputLocked">Ask <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>

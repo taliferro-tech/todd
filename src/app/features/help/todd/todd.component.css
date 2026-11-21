@@ -2495,3 +2495,13 @@
 .tt-made-by > i { width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: .4; }
 .tt-made-by__todd { display: grid; place-items: center; flex: none; width: 24px; height: 24px; }
 .tt-made-by__todd img { width: 24px; height: 24px; object-fit: contain; }
+
+/* Browse mode note for signed-out visitors (same look as the shared app-browse-notice in Network and Outreach). */
+.ask-browse { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 760px; box-sizing: border-box; margin: 0 0 20px; padding: 12px 12px 12px 18px; border-radius: 18px; background: var(--t-blue); color: var(--t-blue-fg); font-family: var(--font); text-align: left; }
+.ask-browse p { flex: 1; margin: 0; font-size: 14px; line-height: 1.45; }
+.ask-browse__eyebrow { display: block; margin-bottom: 2px; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.ask-browse__btn { display: inline-flex; flex: none; align-items: center; height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--text); color: var(--bg) !important; font: 700 14px/1 var(--font); white-space: nowrap; cursor: pointer; }
+@media (max-width: 480px) {
+  .ask-browse { flex-direction: column; align-items: stretch; }
+  .ask-browse__btn { justify-content: center; height: 40px; }
+}

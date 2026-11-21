@@ -2,7 +2,7 @@
 
 .ask-awards { position: fixed; inset: 0; z-index: 1200; color: #eef4f7; font-family: inherit; }
 .ask-awards__backdrop { position: absolute; inset: 0; background: rgba(5, 10, 14, .84); backdrop-filter: blur(10px); }
-.ask-awards__panel { position: relative; width: min(560px, calc(100% - 32px)); max-height: calc(100vh - 32px); margin: 16px auto; padding: 28px 20px; overflow: auto; border: 1px solid rgba(166, 215, 239, .25); border-radius: 24px; background: #151d23; box-shadow: 0 24px 90px rgba(0, 0, 0, .45); }
+.ask-awards__panel { position: relative; width: min(560px, calc(100% - 32px)); max-height: calc(100vh - 32px); margin: 16px auto; padding: 28px 20px; overflow: auto; max-height: calc(100dvh - 32px); overscroll-behavior: contain; -webkit-overflow-scrolling: touch; border: 1px solid rgba(166, 215, 239, .25); border-radius: 24px; background: #151d23; box-shadow: 0 24px 90px rgba(0, 0, 0, .45); }
 .ask-awards__header { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; }
 .ask-awards__eyebrow, .ask-award-unlock__eyebrow { color: #91c9e9; font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
 .ask-awards h2 { margin: 8px 0 4px; font-size: clamp(2rem, 5vw, 3.5rem); line-height: .95; }

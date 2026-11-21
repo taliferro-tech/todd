@@ -177,6 +177,9 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
   routeSuggestions: CommandPaletteResult[] = [];
   private askSubscription?: Subscription;
   private pageContextSubscription?: Subscription;
+  private signedOutSubscription?: Subscription;
+  /** Browse mode (Network's pattern): set once sign-in is known to be off, so signed-in people never see the note flash. */
+  signedOut = false;
   private assistantPageContext: AssistantPageContext | null = null;
   private queryPromptHandled = false;
   private systemOutcomesIdentitySubscription?: Subscription;
@@ -261,6 +264,10 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
     } );
     // The universal menu's Awards link (/awards) opens the awards sheet.
     if ( this.route.snapshot.data['awards'] ) this.openAwards();
+    this.signedOutSubscription = this.authService.isLoggedIn().subscribe( ( loggedIn ) => {
+      this.signedOut = !loggedIn;
+      this.cdr.markForCheck();
+    } );
     this.pageContextSubscription = this.assistantBus.pageContext$.subscribe( ctx => {
       this.assistantPageContext = this.shouldUseProspectPageContext( ctx ) ? ctx : null;
     } );
@@ -279,6 +286,7 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
     this.systemOutcomesPlanSubscription?.unsubscribe();
     this.proactiveMomentumStateSubscription?.unsubscribe();
     this.pageContextSubscription?.unsubscribe();
+    this.signedOutSubscription?.unsubscribe();
   }
 
 
@@ -665,6 +673,11 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
       return true;
     }
     return false;
+  }
+
+  /** Browse-mode note's Sign in: TODD's hosted login, then back to this page. */
+  signInFromBrowseNote (): void {
+    this.authService.startHostedSignIn( this.router.url.split( /[?#]/ )[0] || '/' );
   }
 
   openAwards (): void {

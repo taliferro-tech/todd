@@ -75,3 +75,33 @@
   .ask-head__title { overflow: hidden; text-overflow: ellipsis; }
   .ask-head__actions { gap: 6px; }
 }
+
+/* Chunk-load recovery notice (same as Network's update notice). */
+.ask-update-notice {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  left: auto;
+  z-index: 10020;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 14px 14px 14px 20px;
+  border-radius: 20px;
+  background: var(--text);
+  color: var(--bg);
+  font: 600 15px/1.35 var(--font);
+}
+
+.ask-update-notice button {
+  flex: none;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 18%, transparent);
+  color: var(--bg);
+  font: 700 14px/1 var(--font);
+  cursor: pointer;
+}
