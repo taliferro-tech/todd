@@ -31,7 +31,7 @@
               },
               {
                 "glob": "**/*",
-                "input": "../../taliferro-ui/brand/products",
+                "input": "node_modules/@taliferro/ui/brand/products",
                 "output": "assets/brand/products"
               }
             ],
@@ -73,12 +73,7 @@
               "proxyConfig": "src/proxy.conf.json"
             }
           },
-          "defaultConfiguration": "development",
-          "options": {
-            "prebundle": {
-              "exclude": ["@taliferro/ui"]
-            }
-          }
+          "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
