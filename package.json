@@ -1,6 +1,6 @@
 {
   "name": "ask-todd",
-  "version": "2026.11.20-build.1",
+  "version": "2026.11.20-build.3",
   "private": true,
   "scripts": {
     "ng": "ng",
