@@ -37,11 +37,12 @@ const STYLES = `
   .spacer { flex: 1; }
   h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.04em; }
   .signin { background: var(--surface); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .signin .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
   .btn { height: 44px; padding: 0 22px; border-radius: 999px; background: var(--blue); color: #fff; font-weight: 700; display: inline-flex; align-items: center; text-decoration: none; }
   @media (max-width: 640px) { .page { padding: 20px 16px 48px; } }
 `;
 
-const SIGN_IN = `<div class="signin" data-cy="missions-signin"><b>Sign in to hand 16Ahead work.</b><a class="btn" routerLink="/login">Sign in</a></div>`;
+const SIGN_IN = `<div class="signin" role="note" data-cy="missions-signin"><span class="eyebrow">Browse mode</span><b>You're not signed in.</b><span>Sign in to hand 16Ahead work with Missions and Playbooks.</span><a class="btn" routerLink="/login">Sign in</a></div>`;
 
 @Component( {
   selector: 'app-ask-missions-page',
