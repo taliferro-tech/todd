@@ -37,7 +37,7 @@ import { AskAward, AskAwardsService } from '../../../services/ask-awards.service
 import { AskAwardsComponent } from '../../../shared/ask-awards/ask-awards.component';
 import { SiteFooterComponent } from '../../../shared/site-footer/site-footer.component';
 import { AlsoFromUsComponent } from '../../../shared/also-from-us/also-from-us.component';
-import { AssistantMissionComponent, AssistantMissionsService } from '../../../shared/missions/assistant-missions';
+import { MovesHandoffService } from './moves-handoff.service';
 
 type ToddShowcaseModule = string;
 
@@ -120,8 +120,10 @@ interface ChatChoice {
 interface ChatTurn {
   role: 'user' | 'assistant';
   content: string;
-  /** A Mission the Missions gate started from this ask, shown in place. */
+  /** A Mission an earlier version of this chat started (saved history): a link to it in Moves. */
   missionId?: string;
+  /** Real work handed to Moves: New Mission with this ask filled in. */
+  handoffUrl?: string;
   choices?: ChatChoice[];
   /** The pills can still be tapped: the latest answer, until it's answered. */
   choicesOpen?: boolean;
@@ -132,13 +134,13 @@ interface ChatTurn {
 @Component( {
   selector: 'app-todd',
   standalone: true,
-  imports: [ AlsoFromUsComponent, AutoGrowDirective, SiteFooterComponent, CommonModule, FormsModule, RouterModule, AskAwardsComponent, AssistantMissionComponent],
+  imports: [ AlsoFromUsComponent, AutoGrowDirective, SiteFooterComponent, CommonModule, FormsModule, RouterModule, AskAwardsComponent],
   templateUrl: './todd.component.html',
   styleUrl: './todd.component.css'
 } )
 
 export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy, AfterViewInit {
-  private readonly assistantMissions = inject( AssistantMissionsService );
+  private readonly movesHandoff = inject( MovesHandoffService );
   @ViewChild( 'history' ) historyRef!: ElementRef<HTMLDivElement>;
   @ViewChild( 'assistantInput' ) assistantInputRef?: ElementRef<HTMLInputElement | HTMLTextAreaElement>;
 
@@ -652,20 +654,18 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
   }
 
   /**
-   * The Missions gate, as every other app's assistant asks it (Ty,
-   * 2026-11-17: the General Assistant answered "phone numbers for the VCs in
-   * my Drip" with questions and a promise, because this chat never asked the
-   * gate, so its tools never ran). Real work becomes a Mission shown here; a
-   * quick question is answered by its tool. Signed-in only; help questions,
-   * guests and any error fall through to the assistant as before.
+   * The Missions gate (Ty, 2026-11-17: the chat must ask it so read tools run).
+   * The General Assistant is free and never creates or changes anything (Ty,
+   * 2026-11-22): a question one read tool can answer is answered here; real
+   * work is handed to Moves with the request filled in. Signed-in only; help
+   * questions, guests and any error fall through to the assistant as before.
    * @returns true when the ask was handled here.
    */
   private async tryMission ( prompt: string ): Promise<boolean> {
     if ( !this.userId || this.userId === 'Taliferro' ) return false;
-    const route = await this.assistantMissions.route( prompt, 'general-assistant' );
-    if ( route?.kind === 'mission' ) {
-      this.onMessage( { role: 'assistant', content: '<p>I made this a Mission. Here is the plan:</p>', missionId: route.missionId } );
-      this.assistantMissions.reveal();
+    const route = await this.movesHandoff.route( prompt, { app: 'general-assistant', path: this.isBrowser ? window.location.pathname : '' } );
+    if ( route?.kind === 'handoff' ) {
+      this.onMessage( { role: 'assistant', content: '<p>That\'s a job for Moves. It plans the work across the apps, and you approve it before anything is sent or saved. Your request is filled in there.</p>', handoffUrl: route.url } );
       return true;
     }
     if ( route?.kind === 'answer' ) {

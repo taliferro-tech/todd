@@ -44,15 +44,16 @@ export const routes: Routes = [
     title: 'General Assistant Awards',
   },
   {
-    // Missions (design_handoff_todd_missions): ask, get a plan, start it.
+    // Asking for work and Playbooks moved to Moves (2026-11-22): the General
+    // Assistant is free and never creates or changes anything.
     path: 'missions',
-    title: 'Missions | General Assistant',
-    loadComponent: () => import( './features/missions/missions-pages.component' ).then( ( m ) => m.AskMissionsPageComponent ),
+    data: { page: 'missions' },
+    loadComponent: () => import( './features/missions/moves-redirect.component' ).then( ( m ) => m.MovesRedirectComponent ),
   },
   {
     path: 'playbooks',
-    title: 'Playbooks | General Assistant',
-    loadComponent: () => import( './features/missions/missions-pages.component' ).then( ( m ) => m.PlaybooksPageComponent ),
+    data: { page: 'playbooks' },
+    loadComponent: () => import( './features/missions/moves-redirect.component' ).then( ( m ) => m.MovesRedirectComponent ),
   },
   {
     path: '**',

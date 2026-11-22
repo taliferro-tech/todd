@@ -2505,3 +2505,9 @@
   .ask-browse { flex-direction: column; align-items: stretch; }
   .ask-browse__btn { justify-content: center; height: 40px; }
 }
+
+/* Real work handed to Moves (2026-11-22): one clear button under the answer. */
+.handoff-link {
+  display: inline-flex; align-items: center; height: 44px; margin: 4px 0 10px; padding: 0 22px;
+  border-radius: 999px; background: var(--blue, #0a84ff); color: #fff; font-weight: 700; text-decoration: none;
+}
