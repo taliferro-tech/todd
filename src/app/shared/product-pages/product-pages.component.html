@@ -86,12 +86,6 @@
     <div class="pp-extra"><ng-content></ng-content></div>
   </div>
 
-  <footer class="pp-foot">
-    <span class="pp-foot__company"><strong><a [href]="company.url">{{ company.name }}</a></strong><span>{{ company.address }}</span></span>
-    <span class="pp-foot__legal">
-      <a *ngIf="terms" [href]="terms.url" target="_blank" rel="noopener">{{ terms.label }}</a>
-      <a *ngIf="privacy" [href]="privacy.url" target="_blank" rel="noopener">{{ privacy.label }}</a>
-      <span *ngIf="version">v{{ version }}</span>
-    </span>
-  </footer>
+  <!-- The 16Ahead footer (design_handoff_16ahead_footer, 2026-11-22). -->
+  <app-site-footer [build]="version ? 'v' + version : ''"><a routerLink="/help">Help</a><a routerLink="/about">About</a></app-site-footer>
 </div>

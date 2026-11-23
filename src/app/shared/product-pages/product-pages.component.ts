@@ -9,6 +9,7 @@ import packageJson from '../../../../package.json';
 import { PRODUCT_PAGES, ProductPagesContent } from '@taliferro/ui/platform/product-pages.model';
 import { MENU_COMPANY, MenuIconName, menuIconSvg } from '@taliferro/ui/platform/universal-menu.model';
 import { PlatformMenuComponent } from '../platform-menu/platform-menu.component';
+import { SiteFooterComponent } from '../site-footer/site-footer.component';
 import { PRODUCT_PAGES_CONFIG } from './product-pages.config';
 
 /**
@@ -20,7 +21,7 @@ import { PRODUCT_PAGES_CONFIG } from './product-pages.config';
 @Component( {
   selector: 'app-product-pages',
   standalone: true,
-  imports: [CommonModule, RouterModule, PlatformMenuComponent],
+  imports: [CommonModule, RouterModule, PlatformMenuComponent, SiteFooterComponent],
   templateUrl: './product-pages.component.html',
 } )
 export class ProductPagesComponent implements OnInit, OnDestroy {
