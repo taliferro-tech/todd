@@ -1,5 +1,18 @@
 <!-- The shared About template (taliferro-ui); TODD's story follows it. -->
 <app-product-pages page="about">
+  <!-- The offer in five lines (Ty, 2026-11-22: every page answers what it is, what you get, why it matters, price and terms, next step). -->
+  <section class="pp-section" aria-labelledby="ask-offer-title" data-cy="offer">
+    <p class="pp-kicker">Free</p>
+    <h2 id="ask-offer-title">General Assistant is free</h2>
+    <dl class="pp-rows">
+      <div><dt>What it is</dt><dd>A free assistant that answers questions about 16Ahead and its apps, in plain words.</dd></div>
+      <div><dt>What you get</dt><dd>Short answers, with diagrams where they help, and suggested next questions. Signed in, it also answers quick questions about your own workspace, like a contact's email or a survey's results. When you want something done, it sends you to the app that does it.</dd></div>
+      <div><dt>Why it matters</dt><dd>You find out what 16Ahead can do for your work, and where to do it, without reading every product page.</dd></div>
+      <div><dt>Price</dt><dd>Free. No plan, no card. Ask without an account; sign in to get answers about your own workspace and to keep answers.</dd></div>
+      <div><dt>Next step</dt><dd><a routerLink="/">Open General Assistant</a> and ask your first question.</dd></div>
+    </dl>
+  </section>
+
   <section class="pp-section" aria-labelledby="ask-crm-title">
     <p class="pp-kicker">A Momentum System, not a CRM</p>
     <h2 id="ask-crm-title">Given what you know right now, what should you do next?</h2>

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { ProductPagesComponent } from '../../shared/product-pages/product-pages.component';
 
@@ -10,7 +11,7 @@ import { ProductPagesComponent } from '../../shared/product-pages/product-pages.
 @Component( {
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, ProductPagesComponent],
+  imports: [CommonModule, ProductPagesComponent, RouterLink],
   templateUrl: './about.component.html',
 } )
 export class AboutComponent {
