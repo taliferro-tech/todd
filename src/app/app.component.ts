@@ -27,7 +27,7 @@ import { AskChatStateService } from './services/ask-chat-state.service';
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg><span>Saved</span>
         </button>
         <button type="button" class="ask-pill ask-pill--text" *ngIf="!((isLoggedIn$ | async) ?? false)" (click)="signIn()">Sign in</button>
-        <app-platform-menu [isAdmin]="(isAdmin$ | async) ?? false" [isLoggedIn]="(isLoggedIn$ | async) ?? false" [userName]="(userName$ | async) ?? ''" [userEmail]="(userEmail$ | async) ?? ''" (signOut)="signOut()" />
+        <app-platform-menu [isAdmin]="(isAdmin$ | async) ?? false" [isLoggedIn]="(isLoggedIn$ | async) ?? false" [userName]="(userName$ | async) ?? ''" [userEmail]="(userEmail$ | async) ?? ''" [userId]="(userId$ | async) ?? ''" (signOut)="signOut()" />
       </nav>
     </header>
     <router-outlet />
@@ -54,6 +54,7 @@ export class AppComponent implements OnInit {
   readonly isAdmin$ = this.user$.pipe( map( user => user?.uid === environment.taliferroTenantId ) );
   readonly userName$ = this.user$.pipe( map( user => user?.displayName || '' ) );
   readonly userEmail$ = this.user$.pipe( map( user => user?.email || '' ) );
+  readonly userId$ = this.user$.pipe( map( user => user?.uid || '' ) );
   readonly isEmbedded = typeof window !== 'undefined'
     && new URLSearchParams( window.location.search ).get( 'embedded' ) === 'true';
 
