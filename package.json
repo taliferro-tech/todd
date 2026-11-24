@@ -1,6 +1,6 @@
 {
   "name": "ask-todd",
-  "version": "2026.11.22-build.2",
+  "version": "2026.11.24-build.1",
   "private": true,
   "scripts": {
     "auth:ui": "npx google-artifactregistry-auth",
