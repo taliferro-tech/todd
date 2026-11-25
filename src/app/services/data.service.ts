@@ -411,7 +411,12 @@ export class DataService {
         return user.uid;
     }
 
-    private buildNetworkAuthHeaders ( tenantId: string ): HeadersInit {
+    /**
+     * Raw fetch skips the ID-token interceptor, so add the signed-in
+     * person's Firebase ID token here the same way (the backend's
+     * own-workspace guard verifies it).
+     */
+    private async buildNetworkAuthHeaders ( tenantId: string ): Promise<HeadersInit> {
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
             'x-tenant-id': String( tenantId || '' ).trim()
@@ -426,6 +431,13 @@ export class DataService {
 
         if ( userEmail ) {
             headers['x-user-email'] = userEmail;
+        }
+
+        try {
+            const token = currentUser ? await currentUser.getIdToken() : '';
+            if ( token ) headers['Authorization'] = `Bearer ${token}`;
+        } catch {
+            // signed out or token refresh failed - the request goes out without it
         }
 
         return headers;
@@ -448,7 +460,7 @@ export class DataService {
     private async fetchNetworkEntitlementState ( tenantId: string ): Promise<{ hasNetwork: boolean; baseLimit: number; extraPacks: number; effectiveLimit: number; currentCount: number; remaining: number; }> {
         const response = await fetch( `${this.getBackendUrl()}/network/entitlement`, {
             method: 'POST',
-            headers: this.buildNetworkAuthHeaders( tenantId ),
+            headers: await this.buildNetworkAuthHeaders( tenantId ),
             body: JSON.stringify( { tenantId } )
         } );
 
