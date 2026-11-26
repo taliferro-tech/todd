@@ -120,7 +120,7 @@ interface ChatChoice {
 interface ChatTurn {
   role: 'user' | 'assistant';
   content: string;
-  /** A Mission an earlier version of this chat started (saved history): a link to it in Moves. */
+  /** A Mission planned for this ask (paid workspaces) or from saved history: a link to it in Moves. */
   missionId?: string;
   /** Real work handed to Moves: New Mission with this ask filled in. */
   handoffUrl?: string;
@@ -129,6 +129,17 @@ interface ChatTurn {
   choicesOpen?: boolean;
   /** A question made by tapping pills; the pills already show it, so it has no bubble. */
   fromChoices?: boolean;
+}
+
+/**
+ * True when one ask holds several jobs: long enough, with at least three parts
+ * split by commas, semicolons, "and" or "then".
+ */
+export function looksLikeMultiStep ( prompt: string ): boolean {
+  const text = String( prompt || '' ).trim();
+  if ( text.length < 80 ) return false;
+  const parts = text.split( /[,;]|\band\b|\bthen\b/i ).filter( ( part ) => part.trim().split( /\s+/ ).length >= 3 );
+  return parts.length >= 3;
 }
 
 @Component( {
@@ -536,6 +547,16 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
     this.routeSuggestions = [];
     this.isLoading = true;
 
+    // Several jobs in one ask ("write the email, three posts, a survey…") go to
+    // the Missions gate before the keyword shortcuts below, which would grab one
+    // phrase ("write … email", "find … contacts") and drop the rest (2026-11-26).
+    const multiStep = !fromChoices && looksLikeMultiStep( prompt );
+    if ( multiStep && await this.tryMission( prompt ) ) {
+      this.isLoading = false;
+      this.focusAssistantInput();
+      return;
+    }
+
     if ( await this.tryHandleToddHomeShortcut( prompt ) ) {
       this.isLoading = false;
       this.focusAssistantInput();
@@ -548,7 +569,7 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
       return;
     }
 
-    if ( !fromChoices && await this.tryMission( prompt ) ) {
+    if ( !fromChoices && !multiStep && await this.tryMission( prompt ) ) {
       this.isLoading = false;
       this.focusAssistantInput();
       return;
@@ -672,7 +693,42 @@ export class ToddComponent extends TopDogComponent implements OnInit, OnDestroy,
       this.onMessage( { role: 'assistant', content: toolAnswerHtml( route.text ) } );
       return true;
     }
+    if ( route?.kind === 'mission' ) {
+      const turn: ChatTurn = { role: 'assistant', content: '<p>Working… Moves is planning this across the apps.</p>' };
+      this.onMessage( turn );
+      void this.followMission( turn, route.id );
+      return true;
+    }
     return false;
+  }
+
+  /**
+   * Paid workspaces (2026-11-26): Moves plans the Mission; this line waits for
+   * the plan, then links to it. Nothing starts until Start is pressed in Moves.
+   */
+  private async followMission ( turn: ChatTurn, id: string ): Promise<void> {
+    const show = ( content: string ) => {
+      turn.content = content;
+      turn.missionId = id;
+      this.cdr.detectChanges();
+    };
+    const deadline = Date.now() + 4 * 60 * 1000;
+    while ( Date.now() < deadline ) {
+      await new Promise( ( resolve ) => setTimeout( resolve, 3000 ) );
+      const m = await this.movesHandoff.glance( id );
+      if ( !m || m.status === 'queued' || m.status === 'running' ) continue;
+      if ( m.status === 'proposed' ) {
+        show( `${m.summary ? toolAnswerHtml( m.summary ) : ''}<p>The plan is ready in Moves: ${m.stepCount} steps, each with an owner. Nothing starts until you press Start.</p>` );
+      } else if ( m.status === 'awaiting_user' ) {
+        show( '<p>Moves has a question or two before it plans this. Answer them in Moves.</p>' );
+      } else if ( m.status === 'failed' ) {
+        show( toolAnswerHtml( m.reason || 'Moves couldn’t plan this one. Open it to plan it yourself or tell it more.' ) );
+      } else {
+        show( '<p>Your Mission is in Moves.</p>' );
+      }
+      return;
+    }
+    show( '<p>Moves is still planning this. It’ll be waiting for you there.</p>' );
   }
 
   /** Browse-mode note's Sign in: TODD's hosted login, then back to this page. */
